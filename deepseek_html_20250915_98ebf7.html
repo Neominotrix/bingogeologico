@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingo Geológico</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(to bottom, #2c3e50, #4a6572);
+            color: #f9f9f9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path fill="%23ffffff" opacity="0.05" d="M10,10 C20,30 30,20 50,50 S80,70 90,90 L90,10 Z"/></svg>');
+            z-index: -1;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(44, 62, 80, 0.85);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            margin-top: 20px;
+            border: 1px solid #5d7a91;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, #c57c3c, #e9b44c, #9b2915);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            color: #e9b44c;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 15px;
+            background: linear-gradient(to right, #e9b44c, #c57c3c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .earth-icon {
+            font-size: 3.5rem;
+            color: #4a90e2;
+            margin: 15px 0;
+            text-shadow: 0 0 15px rgba(74, 144, 226, 0.7);
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+        }
+        
+        .frase-container {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #5d7a91;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .frase-container::before {
+            content: """;
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 3rem;
+            color: #e9b44c;
+            opacity: 0.3;
+            font-family: Georgia, serif;
+        }
+        
+        #frase {
+            font-size: 1.8rem;
+            line-height: 1.6;
+            text-align: center;
+            font-weight: 500;
+            color: #f9f9f9;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+        }
+        
+        .botoes {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        button {
+            padding: 14px 25px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        #nova-frase {
+            background: linear-gradient(to right, #4a6572, #2c3e50);
+            color: white;
+            border: 1px solid #5d7a91;
+        }
+        
+        #nova-frase:hover:not(:disabled) {
+            background: linear-gradient(to right, #5d7a91, #34495e);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+        
+        #reiniciar {
+            background: linear-gradient(to right, #c57c3c, #9b2915);
+            color: white;
+            border: 1px solid #e9b44c;
+        }
+        
+        #reiniciar:hover {
+            background: linear-gradient(to right, #d89b5c, #b53d2a);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+        
+        #frases-usadas {
+            background: linear-gradient(to right, #34495e, #2c3e50);
+            color: white;
+            border: 1px solid #5d7a91;
+        }
+        
+        #frases-usadas:hover {
+            background: linear-gradient(to right, #46627f, #34495e);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+        
+        button:disabled {
+            background: linear-gradient(to right, #95a5a6, #7f8c8d);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .contador {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 1.1rem;
+            color: #e9b44c;
+            font-weight: 500;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            display: inline-block;
+            margin: 25px auto;
+            width: 100%;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: linear-gradient(to bottom, #34495e, #2c3e50);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #5d7a91;
+            position: relative;
+        }
+        
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #e9b44c;
+            transition: color 0.3s;
+        }
+        
+        .close:hover {
+            color: #c57c3c;
+        }
+        
+        #lista-frases {
+            list-style-type: none;
+            padding: 15px 0;
+        }
+        
+        #lista-frases li {
+            margin-bottom: 12px;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid #e9b44c;
+        }
+        
+        .rock-divider {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            font-size: 1.5rem;
+            color: #c57c3c;
+            opacity: 0.7;
+        }
+        
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #c9c9c9;
+            font-size: 0.9rem;
+        }
+        
+        .bingo-card {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin: 20px auto;
+            max-width: 500px;
+        }
+        
+        .bingo-cell {
+            aspect-ratio: 1;
+            background: rgba(233, 180, 76, 0.2);
+            border: 2px solid #e9b44c;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #e9b44c;
+            font-weight: bold;
+        }
+        
+        .bingo-cell.marked {
+            background: rgba(233, 180, 76, 0.4);
+            color: #fff;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            #frase {
+                font-size: 1.5rem;
+            }
+            
+            button {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .botoes {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            .earth-icon {
+                font-size: 2.8rem;
+                gap: 15px;
+            }
+            
+            .bingo-card {
+                grid-template-columns: repeat(3, 1fr);
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Bingo geológico</h1>
+            <div class="earth-icon">
+                <i class="fas fa-mountain"></i>
+                <i class="fas fa-globe-americas"></i>
+                <i class="fas fa-volcano"></i>
+            </div>
+        </header>
+        
+        <div class="rock-divider">
+            <i class="fas fa-gem"></i>
+            <i class="fas fa-gem"></i>
+            <i class="fas fa-gem"></i>
+        </div>
+        
+        <div class="frase-container">
+            <p id="frase">Clique no botão para sortear uma frase</p>
+        </div>
+        
+        <div class="botoes">
+            <button id="nova-frase">
+                <i class="fas fa-search"></i> Nova Frase
+            </button>
+            <button id="reiniciar">
+                <i class="fas fa-redo"></i> Reiniciar Ciclo
+            </button>
+            <button id="frases-usadas">
+                <i class="fas fa-history"></i> Frases Já Usadas
+            </button>
+        </div>
+        
+        <p class="contador" id="contador">Frases sorteadas: 0/30</p>
+        
+        <div class="bingo-card">
+            <div class="bingo-cell">B</div>
+            <div class="bingo-cell">I</div>
+            <div class="bingo-cell">N</div>
+            <div class="bingo-cell">G</div>
+            <div class="bingo-cell">O</div>
+            <div class="bingo-cell marked"><i class="fas fa-mountain"></i></div>
+            <div class="bingo-cell"><i class="fas fa-gem"></i></div>
+            <div class="bingo-cell"><i class="fas fa-globe"></i></div>
+            <div class="bingo-cell"><i class="fas fa-fire"></i></div>
+            <div class="bingo-cell marked"><i class="fas fa-water"></i></div>
+            <div class="bingo-cell"><i class="fas fa-hill-rockslide"></i></div>
+            <div class="bingo-cell marked"><i class="fas fa-volcano"></i></div>
+            <div class="bingo-cell">★</div>
+            <div class="bingo-cell"><i class="fas fa-diamond"></i></div>
+            <div class="bingo-cell"><i class="fas fa-helmet-safety"></i></div>
+            <div class="bingo-cell"><i class="fas fa-hill-rockslide"></i></div>
+            <div class="bingo-cell marked"><i class="fas fa-map"></i></div>
+            <div class="bingo-cell"><i class="fas fa-person-digging"></i></div>
+            <div class="bingo-cell"><i class="fas fa-meter"></i></div>
+            <div class="bingo-cell marked"><i class="fas fa-landmark"></i></div>
+            <div class="bingo-cell"><i class="fas fa-mound"></i></div>
+            <div class="bingo-cell marked"><i class="fas fa-signs-post"></i></div>
+            <div class="bingo-cell"><i class="fas fa-road"></i></div>
+            <div class="bingo-cell"><i class="fas fa-tree"></i></div>
+            <div class="bingo-cell"><i class="fas fa-mountain-city"></i></div>
+        </div>
+    </div>
+    
+    <div class="modal" id="modal-frases">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2><i class="fas fa-list-ul"></i> Frases Já Utilizadas</h2>
+            <ul id="lista-frases"></ul>
+        </div>
+    </div>
+
+    <footer>
+        <p>Bingo Geológico - Estudo da Terra através de frases aleatórias</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Array com as 30 frases
+            const frases = [
+                "Camada mais externa e fina da Terra.",
+                "Camada pastosa onde se formam o magma.",
+                "Camada líquida composta por ferro e níquel.",
+                "Camada sólida e mais interna da Terra.",
+                "Fenômeno relacionado à passagem do magma do manto em direção à superfície terrestre.",
+                "Material rochoso fundido no interior da Terra.",
+                "Nome que recebe o magma após sua solidificação.",
+                "Liberação violenta de materiais vulcânicos.",
+                "Tremor de terra causado por movimento das placas.",
+                "Ponto na superfície acima do foco do terremoto.",
+                "Ponto subterrâneo onde inicia o terremoto.",
+                "Instrumento que registra terremotos.",
+                "Onda gigante causada por terremotos oceânicos.",
+                "Grandes blocos que compõem a litosfera.",
+                "Teoria que explica o movimento dos continentes.",
+                "Supercontinente do hemisfério norte.",
+                "Supercontinente do hemisfério sul.",
+                "Supercontinente que existiu há cerca de 300 milhões de anos.",
+                "Movimento das placas que se colidem.",
+                "Movimento das placas que se afastam.",
+                "Movimento das placas que deslizam lateralmente.",
+                "Escala que mede a intensidade dos tsunamis.",
+                "Escala que mede a magnitude dos terremotos.",
+                "Movimentos circulares do material do manto que movem as placas tectônicas.",
+                "Um dos materiais predominantes no núcleo terrestre, que se mantém sólido devido à alta pressão.",
+                "Canal por onde o magma sobe até a superfície durante uma erupção vulcânica.",
+                "Formato circular no topo de um vulcão por onde os materiais são expelidos.",
+                "Reservatório subterrâneo onde o magma fica armazenado antes de uma erupção.",
+                "Misto de gases, vapor d'água e partículas sólidas expelidas durante erupções vulcânicas.",
+                "Estrutura em formato de montanha formada pelo acúmulo de materiais vulcânicos expelidos."
+            ];
+            
+            // Elementos do DOM
+            const fraseElement = document.getElementById('frase');
+            const novaFraseBtn = document.getElementById('nova-frase');
+            const reiniciarBtn = document.getElementById('reiniciar');
+            const frasesUsadasBtn = document.getElementById('frases-usadas');
+            const contadorElement = document.getElementById('contador');
+            const modal = document.getElementById('modal-frases');
+            const closeModal = document.querySelector('.close');
+            const listaFrasesElement = document.getElementById('lista-frases');
+            
+            // Variáveis de estado
+            let frasesDisponiveis = [...frases];
+            let frasesUtilizadas = [];
+            let frasesMostradas = 0;
+            
+            // Função para obter uma frase aleatória
+            function obterFraseAleatoria() {
+                if (frasesDisponiveis.length === 0) {
+                    return null;
+                }
+                
+                const indiceAleatorio = Math.floor(Math.random() * frasesDisponiveis.length);
+                const fraseSelecionada = frasesDisponiveis[indiceAleatorio];
+                
+                // Remove a frase selecionada do array de frases disponíveis
+                frasesDisponiveis.splice(indiceAleatorio, 1);
+                
+                // Adiciona a frase selecionada ao array de frases utilizadas
+                frasesUtilizadas.push(fraseSelecionada);
+                
+                frasesMostradas++;
+                
+                return fraseSelecionada;
+            }
+            
+            // Função para atualizar a frase exibida
+            function atualizarFrase() {
+                if (frasesMostradas >= 30) {
+                    fraseElement.textContent = "Todas as frases já foram mostradas! Clique em 'Reiniciar Ciclo' para começar novamente.";
+                    novaFraseBtn.disabled = true;
+                    return;
+                }
+                
+                const novaFrase = obterFraseAleatoria();
+                if (novaFrase) {
+                    fraseElement.textContent = novaFrase;
+                    contadorElement.textContent = `Frases sorteadas: ${frasesMostradas}/30`;
+                }
+                
+                if (frasesMostradas === 30) {
+                    novaFraseBtn.disabled = true;
+                }
+            }
+            
+            // Função para reiniciar o ciclo
+            function reiniciarCiclo() {
+                frasesDisponiveis = [...frases];
+                frasesUtilizadas = [];
+                frasesMostradas = 0;
+                fraseElement.textContent = "Clique no botão para sortear uma frase";
+                contadorElement.textContent = "Frases sorteadas: 0/30";
+                novaFraseBtn.disabled = false;
+            }
+            
+            // Função para mostrar as frases já utilizadas
+            function mostrarFrasesUtilizadas() {
+                listaFrasesElement.innerHTML = '';
+                
+                if (frasesUtilizadas.length === 0) {
+                    listaFrasesElement.innerHTML = '<li>Nenhuma frase foi utilizada ainda.</li>';
+                } else {
+                    frasesUtilizadas.forEach((frase, index) => {
+                        const li = document.createElement('li');
+                        li.textContent = frase;
+                        listaFrasesElement.appendChild(li);
+                    });
+                }
+                
+                modal.style.display = 'flex';
+            }
+            
+            // Event Listeners
+            novaFraseBtn.addEventListener('click', atualizarFrase);
+            reiniciarBtn.addEventListener('click', reiniciarCiclo);
+            frasesUsadasBtn.addEventListener('click', mostrarFrasesUtilizadas);
+            
+            closeModal.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+            
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
